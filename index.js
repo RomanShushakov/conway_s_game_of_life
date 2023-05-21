@@ -92,7 +92,7 @@ const cellShaderModule = device.createShaderModule({
 
         @vertex
         fn vert_main(
-            @location(0) position: vec2<f32>, @builtin(instance_index) instance: u32
+            @location(0) position: vec2<f32>, @builtin(instance_index) instance: u32,
         )
             -> VertexOutput
         {
@@ -133,6 +133,9 @@ const cellPipeline = device.createRenderPipeline({
         targets: [{
             format: canvasFormat,
         }],
+    },
+    primitive: {
+        topology: "triangle-list",
     },
 });
 
