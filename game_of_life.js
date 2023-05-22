@@ -23,4 +23,3 @@ context.configure({
 });
 
 const gameOfLife = await initializeGameOfLife(device, context, canvasFormat);
-gameOfLife.define_simulation_pipeline();

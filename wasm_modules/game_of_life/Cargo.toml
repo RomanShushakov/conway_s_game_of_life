@@ -32,6 +32,16 @@ web-sys = {version = "0.3.63", features = [
     "GpuPipelineLayout",
     "GpuComputePipelineDescriptor",
     "GpuComputePipeline",
+    "GpuBindGroup",
+    "GpuBindGroupDescriptor",
+    "GpuBindGroupEntry",
+    "GpuBufferBinding",
+    "GpuBuffer",
+    "GpuBufferDescriptor",
+    "gpu_buffer_usage",
+    "GpuQueue",
 ]}
 
 js-sys = "0.3.63"
+rand = "0.8.5"
+getrandom = { version = "0.2.9", features = ["js"] }

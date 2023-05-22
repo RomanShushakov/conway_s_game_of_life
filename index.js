@@ -293,7 +293,7 @@ function updateGrid() {
     step++; // Increment the step count
 
     // Start a render pass
-    const pass = encoder.beginRenderPass({
+    const renderPass = encoder.beginRenderPass({
         colorAttachments: [{
             view: context.getCurrentTexture().createView(),
             loadOp: "clear",
@@ -303,13 +303,13 @@ function updateGrid() {
     });
 
     // Draw the grid.
-    pass.setPipeline(cellPipeline);
-    pass.setBindGroup(0, bindGroups[step % 2]);
-    pass.setVertexBuffer(0, vertexBuffer);
-    pass.draw(vertices.length / 2, GRID_SIZE * GRID_SIZE);
+    renderPass.setPipeline(cellPipeline);
+    renderPass.setBindGroup(0, bindGroups[step % 2]);
+    renderPass.setVertexBuffer(0, vertexBuffer);
+    renderPass.draw(vertices.length / 2, GRID_SIZE * GRID_SIZE);
 
     // End the render pass and submit the command buffer
-    pass.end();
+    renderPass.end();
     device.queue.submit([encoder.finish()]);
 }
 setInterval(updateGrid, UPDATE_INTERVAL);
