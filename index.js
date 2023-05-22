@@ -1,8 +1,8 @@
-const GRID_SIZE = 32;
-const UPDATE_INTERVAL = 250;
+const GRID_SIZE = 64;
+const UPDATE_INTERVAL = 100;
 const WORKGROUP_SIZE = 8;
 
-const canvas = document.querySelector("canvas");
+const canvas = document.getElementById("pure-js");
 
 // WebGPU device initialization
 if (!navigator.gpu) {

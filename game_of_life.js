@@ -1,10 +1,11 @@
 import { initializeGameOfLife } from "./wasm_modules_initialization/game_of_life_init.js";
 
+const GRID_SIZE = 64;
+const UPDATE_INTERVAL = 100;
+const WORKGROUP_SIZE = 8;
 
-const UPDATE_INTERVAL = 250;
 
-
-const canvas = document.querySelector("canvas");
+const canvas = document.getElementById("wasm-js");
 if (!canvas) {
     throw new Error("Canvas not found.");
 }
@@ -25,7 +26,7 @@ context.configure({
     format: canvasFormat,
 });
 
-const gameOfLife = await initializeGameOfLife(device, context, canvasFormat);
+const gameOfLife = await initializeGameOfLife(GRID_SIZE, WORKGROUP_SIZE, device, context, canvasFormat);
 
 let step = 0;
 function updateGrid() {

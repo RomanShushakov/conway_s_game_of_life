@@ -12,7 +12,7 @@ fn cell_active(x: u32, y: u32) -> u32
     return cell_state_in[cell_index(vec2<u32>(x, y))];
 }
 
-@compute @workgroup_size(8, 8)
+@compute @workgroup_size(${WORKGROUP_SIZE}, ${WORKGROUP_SIZE})
 fn comp_main(@builtin(global_invocation_id) cell: vec3<u32>)
 {
     // Determine how many active neighbors this cell has.
