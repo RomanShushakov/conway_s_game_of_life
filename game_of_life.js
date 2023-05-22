@@ -1,6 +1,9 @@
 import { initializeGameOfLife } from "./wasm_modules_initialization/game_of_life_init.js";
 
 
+const UPDATE_INTERVAL = 250;
+
+
 const canvas = document.querySelector("canvas");
 if (!canvas) {
     throw new Error("Canvas not found.");
@@ -23,3 +26,12 @@ context.configure({
 });
 
 const gameOfLife = await initializeGameOfLife(device, context, canvasFormat);
+
+let step = 0;
+function updateGrid() {
+    const compState = step % 2;
+    step++;
+    const rendState = step % 2;
+    gameOfLife.update_grid(compState, rendState);
+}
+setInterval(updateGrid, UPDATE_INTERVAL);

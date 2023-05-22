@@ -1,5 +1,4 @@
 @group(0) @binding(0) var<uniform> grid: vec2<f32>;
-
 @group(0) @binding(1) var<storage> cell_state_in: array<u32>;
 @group(0) @binding(2) var<storage, read_write> cell_state_out: array<u32>;
 

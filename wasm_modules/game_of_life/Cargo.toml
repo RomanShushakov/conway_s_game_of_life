@@ -48,6 +48,18 @@ web-sys = {version = "0.3.63", features = [
     "GpuRenderPipeline",
     "GpuFragmentState",
     "GpuColorTargetState",
+    "GpuCommandEncoder",
+    "GpuComputePassEncoder",
+    "GpuRenderPassEncoder",
+    "GpuRenderPassDescriptor",
+    "GpuRenderPassColorAttachment",
+    "GpuLoadOp",
+    "GpuStoreOp",
+    "GpuTexture",
+    "GpuTextureView",
+    "GpuPrimitiveTopology",
+    "GpuPrimitiveState",
+    "GpuCommandBuffer",
 ]}
 
 js-sys = "0.3.63"
