@@ -40,6 +40,14 @@ web-sys = {version = "0.3.63", features = [
     "GpuBufferDescriptor",
     "gpu_buffer_usage",
     "GpuQueue",
+    "GpuVertexState",
+    "GpuVertexBufferLayout",
+    "GpuVertexAttribute",
+    "GpuVertexFormat",
+    "GpuRenderPipelineDescriptor",
+    "GpuRenderPipeline",
+    "GpuFragmentState",
+    "GpuColorTargetState",
 ]}
 
 js-sys = "0.3.63"

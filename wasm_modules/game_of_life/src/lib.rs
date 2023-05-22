@@ -6,7 +6,8 @@ use web_sys::
     GpuBindGroupLayoutEntry, GpuBufferBindingLayout, GpuBufferBindingType, GpuBindGroupLayoutDescriptor, 
     GpuBindGroupLayout, GpuPipelineLayoutDescriptor, GpuPipelineLayout, GpuComputePipelineDescriptor, 
     GpuComputePipeline, GpuBindGroup, GpuBindGroupDescriptor, GpuBindGroupEntry, GpuBufferBinding, GpuBuffer,
-    GpuBufferDescriptor, GpuQueue,
+    GpuBufferDescriptor, GpuQueue, GpuVertexState, GpuVertexBufferLayout, GpuVertexAttribute, GpuVertexFormat,
+    GpuRenderPipelineDescriptor, GpuRenderPipeline,GpuFragmentState, GpuColorTargetState,
 };
 
 use web_sys::gpu_shader_stage::{VERTEX, COMPUTE};
@@ -79,7 +80,7 @@ impl GameOfLife
     }
 
 
-    fn define_simulation_pipeline(&self, bind_group_layout: &GpuBindGroupLayout) -> GpuComputePipeline
+    fn define_pipeline_layout(&self, bind_group_layout: &GpuBindGroupLayout) -> GpuPipelineLayout
     {
         let bind_group_layouts = [bind_group_layout].iter().collect::<js_sys::Array>();
 
@@ -87,12 +88,51 @@ impl GameOfLife
         pipeline_layout_descriptor.label("Cell Pipeline Layout");
         let pipeline_layout = self.gpu_device.create_pipeline_layout(&pipeline_layout_descriptor);
 
-        let mut gpu_shader_module_descriptor = GpuShaderModuleDescriptor::new(include_str!("../shader/simulate.wgsl"));
-        gpu_shader_module_descriptor.label("Life simulation shader");
-        let gpu_shader_module = self.gpu_device.create_shader_module(&gpu_shader_module_descriptor);
+        pipeline_layout
+    }
+
+
+    fn define_cell_pipeline(&self, pipeline_layout: &GpuPipelineLayout) -> GpuRenderPipeline
+    {
+        let mut cell_shader_module_descriptor = GpuShaderModuleDescriptor::new(include_str!("../shader/cell.wgsl"));
+        cell_shader_module_descriptor.label("Cell shader");
+        let cell_shader_module = self.gpu_device.create_shader_module(&cell_shader_module_descriptor);
+
+        let mut gpu_vertex_state = GpuVertexState::new("vert_main", &cell_shader_module);
+        let vertex_attribute = GpuVertexAttribute::new(GpuVertexFormat::Float32x2, 0f64, 0u32);
+        let vertex_buffer_layout_attributes = [vertex_attribute].iter().collect::<js_sys::Array>();
+        let vertex_buffer_layout = GpuVertexBufferLayout::new(8f64, &vertex_buffer_layout_attributes);
+        let vertex_state_buffers = [vertex_buffer_layout].iter().collect::<js_sys::Array>();
+        gpu_vertex_state.buffers(&vertex_state_buffers);
+
+        let color_target_state = GpuColorTargetState::new(self.canvas_format);
+        let fragment_state_targets = [color_target_state].iter().collect::<js_sys::Array>();
+        let gpu_fragment_state = GpuFragmentState::new("frag_main", &cell_shader_module, &fragment_state_targets);
+
+        let mut gpu_render_pipeline_descriptor = GpuRenderPipelineDescriptor::new(
+            pipeline_layout, &gpu_vertex_state,
+        );
+        gpu_render_pipeline_descriptor.label("Cell pipeline");
+        gpu_render_pipeline_descriptor.fragment(&gpu_fragment_state);
+
+        let gpu_render_pipeline = self.gpu_device.create_render_pipeline(&gpu_render_pipeline_descriptor);
+
+        gpu_render_pipeline
+    }
+
+
+    fn define_simulation_pipeline(&self, pipeline_layout: &GpuPipelineLayout) -> GpuComputePipeline
+    {
+        let mut simulation_shader_module_descriptor = GpuShaderModuleDescriptor::new(
+            include_str!("../shader/simulate.wgsl"),
+        );
+        simulation_shader_module_descriptor.label("Life simulation shader");
+        let gpu_shader_module = self.gpu_device.create_shader_module(&simulation_shader_module_descriptor);
         let gpu_programmable_stage = GpuProgrammableStage::new("comp_main", &gpu_shader_module);
 
-        let mut gpu_compute_pipeline_descriptor = GpuComputePipelineDescriptor::new(&pipeline_layout, &gpu_programmable_stage);
+        let mut gpu_compute_pipeline_descriptor = GpuComputePipelineDescriptor::new(
+            pipeline_layout, &gpu_programmable_stage,
+        );
         gpu_compute_pipeline_descriptor.label("Simulation pipeline");
         let gpu_compute_pipeline = self.gpu_device.create_compute_pipeline(&gpu_compute_pipeline_descriptor);
 
