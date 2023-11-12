@@ -16,7 +16,7 @@ fn cell_active(x: u32, y: u32) -> u32
 fn comp_main(@builtin(global_invocation_id) cell: vec3<u32>)
 {
     // Determine how many active neighbors this cell has.
-    let activeNeighbors = 
+    let active_neighbours = 
         cell_active(cell.x + 1u, cell.y + 1u) +
         cell_active(cell.x + 1u, cell.y) +
         cell_active(cell.x + 1u, cell.y - 1u) +
@@ -29,7 +29,7 @@ fn comp_main(@builtin(global_invocation_id) cell: vec3<u32>)
     let i = cell_index(cell.xy);
 
     // Conway's game of life rules:
-    switch activeNeighbors 
+    switch active_neighbours 
     {
         case 2u: // Active cells with 2 neighbors stay active.
         { 
