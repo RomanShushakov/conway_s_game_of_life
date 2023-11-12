@@ -17,7 +17,7 @@ if (!adapter) {
 const device = await adapter.requestDevice();
 
 // Canvas configuration
-const context = canvas.getContext("webgpu");
+const context = canvas.getContext("webgpu", {  });
 const canvasFormat = navigator.gpu.getPreferredCanvasFormat();
 context.configure({
     device: device,
@@ -26,12 +26,17 @@ context.configure({
 
 // Create a buffer with the vertices for a single cell.
 const vertices = new Float32Array([
-    -0.8, -0.8,
+    // -0.8, -0.8,
+    // 0.8, -0.8,
+    // 0.8, 0.8,
+
+    // -0.8, -0.8,
+    // 0.8, 0.8,
+    // -0.8, 0.8,
+
     0.8, -0.8,
     0.8, 0.8,
-
     -0.8, -0.8,
-    0.8, 0.8,
     -0.8, 0.8,
 ]);
 const vertexBuffer = device.createBuffer({
@@ -132,10 +137,23 @@ const cellPipeline = device.createRenderPipeline({
         entryPoint: "frag_main",
         targets: [{
             format: canvasFormat,
+            // blend: {
+            //     color: {
+            //         operation: "add",
+            //         srcFactor: "src",
+            //         dstFactor: "src",
+            //     },
+            //     alpha: {
+            //         operation: "add",
+            //         srcFactor: "src-alpha",
+            //         dstFactor: "src-alpha",
+            //     },
+            // }
         }],
     },
     primitive: {
-        topology: "triangle-list",
+        // topology: "triangle-list",
+        topology: "triangle-strip",
     },
 });
 
@@ -297,7 +315,7 @@ function updateGrid() {
         colorAttachments: [{
             view: context.getCurrentTexture().createView(),
             loadOp: "clear",
-            clearValue: { r: 0, g: 0, b: 0.4, a: 1.0 },
+            clearValue: { r: 1.0, g: 1.0, b: 1.0, a: 1.0 },
             storeOp: "store",
         }],
     });

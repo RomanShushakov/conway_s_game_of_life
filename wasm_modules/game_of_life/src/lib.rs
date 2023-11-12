@@ -2,14 +2,13 @@ use wasm_bindgen::prelude::wasm_bindgen;
 
 use web_sys::
 {
-    GpuDevice, GpuCanvasContext, GpuTextureFormat, GpuShaderModuleDescriptor, GpuShaderModule, GpuProgrammableStage,
+    GpuDevice, GpuCanvasContext, GpuTextureFormat, GpuShaderModuleDescriptor, GpuProgrammableStage,
     GpuBindGroupLayoutEntry, GpuBufferBindingLayout, GpuBufferBindingType, GpuBindGroupLayoutDescriptor, 
     GpuBindGroupLayout, GpuPipelineLayoutDescriptor, GpuPipelineLayout, GpuComputePipelineDescriptor, 
     GpuComputePipeline, GpuBindGroup, GpuBindGroupDescriptor, GpuBindGroupEntry, GpuBufferBinding, GpuBuffer,
-    GpuBufferDescriptor, GpuQueue, GpuVertexState, GpuVertexBufferLayout, GpuVertexAttribute, GpuVertexFormat,
-    GpuRenderPipelineDescriptor, GpuRenderPipeline,GpuFragmentState, GpuColorTargetState, GpuCommandEncoder,
-    GpuComputePassEncoder, GpuRenderPassEncoder, GpuRenderPassDescriptor, GpuRenderPassColorAttachment, GpuLoadOp,
-    GpuStoreOp, GpuTexture, GpuTextureView, GpuPrimitiveTopology, GpuPrimitiveState, GpuCommandBuffer, GpuColorDict,
+    GpuBufferDescriptor, GpuVertexState, GpuVertexBufferLayout, GpuVertexAttribute, GpuVertexFormat,
+    GpuRenderPipelineDescriptor, GpuRenderPipeline,GpuFragmentState, GpuColorTargetState,  GpuRenderPassDescriptor, 
+    GpuRenderPassColorAttachment, GpuLoadOp, GpuStoreOp, GpuPrimitiveTopology, GpuPrimitiveState, GpuColorDict,
 };
 
 use web_sys::gpu_shader_stage::{VERTEX, COMPUTE};
@@ -97,7 +96,7 @@ fn define_bind_groups(
 ) 
     -> [GpuBindGroup; 2]
 {
-    let mut uniform_array = Float32Array::new_with_length([grid_size, grid_size].len() as u32);
+    let uniform_array = Float32Array::new_with_length([grid_size, grid_size].len() as u32);
     uniform_array.copy_from(&[grid_size as f32, grid_size as f32]);
     let mut uniform_buffer_descriptor = GpuBufferDescriptor::new(
         uniform_array.byte_length().into(),
@@ -108,7 +107,7 @@ fn define_bind_groups(
     gpu_device.queue().write_buffer_with_u32_and_buffer_source(&uniform_buffer, 0, &uniform_array);
 
     let mut cell_state = Vec::new();
-    for i in 0..grid_size * grid_size
+    for _ in 0..grid_size * grid_size
     {
         let rnd = thread_rng().gen_range(0u32..2);
         cell_state.push(rnd);
@@ -204,7 +203,7 @@ fn define_vertex_buffer(gpu_device: &GpuDevice) -> GpuBuffer
         -0.8, -0.8, 0.8, 0.8, -0.8, 0.8,
     ];
 
-    let mut vertices_array = Float32Array::new_with_length(vertices.len() as u32);
+    let vertices_array = Float32Array::new_with_length(vertices.len() as u32);
     vertices_array.copy_from(&vertices);
 
     let mut vertex_buffer_descriptor = GpuBufferDescriptor::new(
@@ -233,7 +232,6 @@ pub struct GameOfLife
     props: Props,
     gpu_device: GpuDevice,
     context: GpuCanvasContext,
-    canvas_format: GpuTextureFormat,
     simulation_pipeline: GpuComputePipeline,
     cell_pipeline: GpuRenderPipeline,
     vertex_buffer: GpuBuffer,
@@ -264,7 +262,7 @@ impl GameOfLife
 
         GameOfLife 
         { 
-            props, gpu_device, context, canvas_format, simulation_pipeline, cell_pipeline, vertex_buffer, bind_groups,
+            props, gpu_device, context, simulation_pipeline, cell_pipeline, vertex_buffer, bind_groups,
         }
     }
 
@@ -276,7 +274,7 @@ impl GameOfLife
         let compute_pass = encoder.begin_compute_pass();
 
         compute_pass.set_pipeline(&self.simulation_pipeline);
-        compute_pass.set_bind_group(0, &self.bind_groups[comp_state]);
+        compute_pass.set_bind_group(0, Some(&self.bind_groups[comp_state]));
         let workgroup_count = (self.props.grid_size / self.props.workgroup_size) as u32;
         compute_pass.dispatch_workgroups_with_workgroup_count_y(workgroup_count, workgroup_count);
         compute_pass.end();
@@ -289,8 +287,8 @@ impl GameOfLife
         let render_pass_descriptor = GpuRenderPassDescriptor::new(&color_attachments);
         let render_pass = encoder.begin_render_pass(&render_pass_descriptor);
         render_pass.set_pipeline(&self.cell_pipeline);
-        render_pass.set_bind_group(0, &self.bind_groups[rend_state]);
-        render_pass.set_vertex_buffer(0u32, &self.vertex_buffer);
+        render_pass.set_bind_group(0, Some(&self.bind_groups[rend_state]));
+        render_pass.set_vertex_buffer(0u32, Some(&self.vertex_buffer));
         render_pass.draw_with_instance_count(6, (self.props.grid_size * self.props.grid_size) as u32);
         render_pass.end();
 
