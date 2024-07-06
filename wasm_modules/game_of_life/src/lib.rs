@@ -79,7 +79,8 @@ fn define_simulation_pipeline(
     );
     simulation_shader_module_descriptor.label("Life simulation shader");
     let gpu_shader_module = gpu_device.create_shader_module(&simulation_shader_module_descriptor);
-    let gpu_programmable_stage = GpuProgrammableStage::new("comp_main", &gpu_shader_module);
+    // let gpu_programmable_stage = GpuProgrammableStage::new("comp_main", &gpu_shader_module);
+    let gpu_programmable_stage = GpuProgrammableStage::new(&gpu_shader_module);
 
     let mut gpu_compute_pipeline_descriptor = GpuComputePipelineDescriptor::new(
         pipeline_layout, &gpu_programmable_stage,
@@ -171,7 +172,8 @@ fn define_cell_pipeline(
     cell_shader_module_descriptor.label("Cell shader");
     let cell_shader_module = gpu_device.create_shader_module(&cell_shader_module_descriptor);
 
-    let mut gpu_vertex_state = GpuVertexState::new("vert_main", &cell_shader_module);
+    // let mut gpu_vertex_state = GpuVertexState::new("vert_main", &cell_shader_module);
+    let mut gpu_vertex_state = GpuVertexState::new(&cell_shader_module);
     let vertex_attribute = GpuVertexAttribute::new(GpuVertexFormat::Float32x2, 0f64, 0u32);
     let vertex_buffer_layout_attributes = [vertex_attribute].iter().collect::<js_sys::Array>();
     let vertex_buffer_layout = GpuVertexBufferLayout::new(8f64, &vertex_buffer_layout_attributes);
@@ -180,7 +182,8 @@ fn define_cell_pipeline(
 
     let color_target_state = GpuColorTargetState::new(canvas_format);
     let fragment_state_targets = [color_target_state].iter().collect::<js_sys::Array>();
-    let gpu_fragment_state = GpuFragmentState::new("frag_main", &cell_shader_module, &fragment_state_targets);
+    // let gpu_fragment_state = GpuFragmentState::new("frag_main", &cell_shader_module, &fragment_state_targets);
+    let gpu_fragment_state = GpuFragmentState::new(&cell_shader_module, &fragment_state_targets);
 
     let mut gpu_render_pipeline_descriptor = GpuRenderPipelineDescriptor::new(
         pipeline_layout, &gpu_vertex_state,
